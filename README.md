@@ -1,5 +1,7 @@
-﻿# INSTALLER REPACK
-A "simple" installer C# project template for making installers
+﻿# Arphros Installer (Powered by Installer Repack)
+A fork of Installer Repack specifically used for Arphros
+
+# Original Repository README
 
 ## Requirements
 - .NET Framework 4.7.2

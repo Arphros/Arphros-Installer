@@ -17,35 +17,34 @@ namespace Uninstaller
         #region Setup Config
 
         // The original name of the program
-        public const string programName = "Godot";
+        public const string programName = "Arphros";
 
         // The company/creator name of the program
-        const string companyName = "Godot Foundation";
+        const string companyName = "Four Developers";
 
         // The version of the program
-        const string appVersion = "3.5.2-stable";
+        const string appVersion = "1.01";
 
         // The link for the program
-        const string programLink = "https://godotengine.org";
+        const string programLink = "https://arphros.kjn.in.th";
 
         // The window title of the setup
-        const string installerName = "Godot Setup";
+        const string installerName = "Arphros Setup";
 
         // This is what will be shown default on installation path
-        const string defaultDestinationPath = "C:\\Program Files (x86)\\Godot";
+        static string defaultDestinationPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arphros");
 
         // This path is relative to the destination path
-        const string exePath = "Godot_v3.5.2-stable_win64.exe";
+        const string exePath = "Arphros.exe";
 
         // A special GUID specific for the program (you can use Guid.NewGuid() too)
-        const string programGUID = "{5c023135-e620-402b-b2ae-17c670e5f843}";
+        const string programGUID = "{62c35773-2426-408d-935c-e12823a1002c}";
 
         // Format: { <Extension>, <FileDescription> }
         static Dictionary<string, string> associations = new Dictionary<string, string>()
         {
-            { ".godot", "Godot Project File" }
+            { ".arphros", "Arphros Playable Level" }
         };
-
         #endregion
 
         #region Variables
@@ -108,8 +107,8 @@ namespace Uninstaller
                 Invoke(new Action(() => deleteLabel.Text = $"Deleting shortcuts..."));
                 string roamingStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
                 string commonStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-                string appStartMenuPath = Path.Combine(roamingStartMenuPath, "Programs", companyName);
-                string appStartMenuPath2 = Path.Combine(commonStartMenuPath, "Programs", companyName);
+                string appStartMenuPath = Path.Combine(roamingStartMenuPath, "Programs", programName);
+                string appStartMenuPath2 = Path.Combine(commonStartMenuPath, "Programs", programName);
                 object shDesktop = (object)"Desktop";
                 WshShell shell = new WshShell();
                 string shortcutAddress = (string)shell.SpecialFolders.Item(ref shDesktop) + $"\\{programName}.lnk";
@@ -132,6 +131,8 @@ namespace Uninstaller
                     if (DeleteAssociation(assoc.Key, programName))
                         SHChangeNotify(0x8000000, 0x1000, IntPtr.Zero, IntPtr.Zero);
                 }
+
+                DeleteUrlProtocol();
 
                 MessageBox.Show($"{programName} has been uninstalled from your computer!");
             }
@@ -189,6 +190,12 @@ namespace Uninstaller
             madeChanges |= RemoveKey(@"Software\Classes\" + progId);
             madeChanges |= RemoveKey($@"Software\Classes\{progId}\shell\open\command");
             return madeChanges;
+        }
+
+        private void DeleteUrlProtocol()
+        {
+            string customProtocol = "arphros";
+            Registry.ClassesRoot.DeleteSubKey(customProtocol, false);
         }
 
         public void End()

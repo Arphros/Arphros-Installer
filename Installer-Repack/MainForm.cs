@@ -11,44 +11,44 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using IWshRuntimeLibrary;
 using Ionic.Zip;
 
-namespace Aseprite_Repack
+namespace InstallerRepack
 {
     public partial class MainForm : Form
     {
         #region Setup Config
 
         // The original name of the program
-        public const string programName = "Godot";
+        public const string programName = "Arphros";
 
         // The company/creator name of the program
-        const string companyName = "Godot Foundation";
+        const string companyName = "Four Developers";
 
         // The version of the program
-        const string appVersion = "3.5.2-stable";
+        const string appVersion = "1.01";
 
         // The link for the program
-        const string programLink = "https://godotengine.org";
+        const string programLink = "https://arphros.kjn.in.th";
 
         // The window title of the setup
-        const string installerName = "Godot Setup";
+        const string installerName = "Arphros Setup";
 
         // This is what will be shown default on installation path
-        const string defaultDestinationPath = "C:\\Program Files (x86)\\Godot";
+        static string defaultDestinationPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Arphros");
 
         // This path is relative to the destination path
-        const string exePath = "Godot_v3.5.2-stable_win64.exe";
+        const string exePath = "Arphros.exe";
 
         // A special GUID specific for the program (you can use Guid.NewGuid() too)
-        const string programGUID = "{5c023135-e620-402b-b2ae-17c670e5f843}";
+        const string programGUID = "{62c35773-2426-408d-935c-e12823a1002c}";
 
         // Format: { <Extension>, <FileDescription> }
         static Dictionary<string, string> associations = new Dictionary<string, string>()
         {
-            { ".godot", "Godot Project File" }
+            { ".arphros", "Arphros Playable Level" }
         };
 
         // Manually put the extracted size of your program (in bytes)
-        long archiveSize = 76582340;
+        long archiveSize = 200193895;
 
         // Put your archive on InstallerResource.resx
         static byte[] archiveBytes = InstallerResource.InstallationArchive;
@@ -282,6 +282,7 @@ namespace Aseprite_Repack
                         if (startMenuIconBox.Checked) CreateStartMenuShortcut();
                         foreach(var box in assocBoxes)
                             box.TryAssignAssoc(executablePath);
+                        CreateUrlProtocol();
                         CreateUninstaller();
                         System.IO.File.WriteAllText(Path.Combine(destinationPath, "Uninstall.inf"), string.Join("\n", installedPaths));
                         System.IO.File.WriteAllBytes(Path.Combine(destinationPath, "Uninstall.exe"), InstallerResource.Uninstaller);
@@ -317,8 +318,8 @@ namespace Aseprite_Repack
             string pathToExe = Path.Combine(destinationPath, exePath);
             string roamingStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
             string commonStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-            string appStartMenuPath = Path.Combine(roamingStartMenuPath, "Programs", companyName);
-            string appStartMenuPath2 = Path.Combine(commonStartMenuPath, "Programs", companyName);
+            string appStartMenuPath = Path.Combine(roamingStartMenuPath, "Programs", programName);
+            string appStartMenuPath2 = Path.Combine(commonStartMenuPath, "Programs", programName);
 
             if (!Directory.Exists(appStartMenuPath))
                 Directory.CreateDirectory(appStartMenuPath);
@@ -421,6 +422,37 @@ namespace Aseprite_Repack
                         "An error occurred writing uninstall information to the registry. The service is fully installed but can only be uninstalled manually through the command line.",
                         ex);*/
                 }
+            }
+        }
+
+        private void CreateUrlProtocol()
+        {
+            try
+            {
+                string customProtocol = "arphros";
+                RegistryKey key = Registry.ClassesRoot.OpenSubKey(customProtocol);
+
+                if (key == null)
+                {
+                    key = Registry.ClassesRoot.CreateSubKey(customProtocol);
+
+                    key.SetValue(string.Empty, "URL:" + customProtocol);
+                    key.SetValue("URL Protocol", string.Empty);
+                }
+
+                var subKey = key.OpenSubKey(@"shell\open\command");
+                if (subKey == null)
+                {
+                    subKey = key.CreateSubKey(@"shell\open\command");
+                    subKey.SetValue(string.Empty, $"\"{Path.Combine(destinationPath, exePath)}\" %1");
+                }
+
+                subKey.Close();
+                key.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
