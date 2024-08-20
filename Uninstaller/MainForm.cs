@@ -15,7 +15,6 @@ namespace Uninstaller
     public partial class MainForm : Form
     {
         #region Setup Config
-
         // The original name of the program
         public const string programName = "Arphros";
 
