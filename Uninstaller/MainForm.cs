@@ -22,7 +22,7 @@ namespace Uninstaller
         const string companyName = "Four Developers";
 
         // The version of the program
-        const string appVersion = "1.01";
+        const string appVersion = "2.0f1";
 
         // The link for the program
         const string programLink = "https://arphros.kjn.in.th";

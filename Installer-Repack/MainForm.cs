@@ -24,7 +24,7 @@ namespace InstallerRepack
         const string companyName = "Four Developers";
 
         // The version of the program
-        const string appVersion = "1.01";
+        const string appVersion = "2.0b1";
 
         // The link for the program
         const string programLink = "https://arphros.kjn.in.th";
@@ -48,7 +48,7 @@ namespace InstallerRepack
         };
 
         // Manually put the extracted size of your program (in bytes)
-        long archiveSize = 200193895;
+        long archiveSize = 128307605;
 
         // Put your archive on InstallerResource.resx
         static byte[] archiveBytes = InstallerResource.InstallationArchive;
