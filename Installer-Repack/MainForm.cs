@@ -24,7 +24,7 @@ namespace InstallerRepack
         const string companyName = "Four Developers";
 
         // The version of the program
-        const string appVersion = "2.0b1";
+        const string appVersion = "2.1f1";
 
         // The link for the program
         const string programLink = "https://arphros.kjn.in.th";
@@ -232,7 +232,6 @@ namespace InstallerRepack
 
         public Task InstallationTask()
         {
-        
             try
             {
                 if (!Directory.Exists(destinationPath))
@@ -275,6 +274,7 @@ namespace InstallerRepack
                             }
                         }
                     }
+
                     Invoke(new Action(() =>
                     {
                         string executablePath = Path.Combine(destinationPath, exePath);
@@ -348,8 +348,8 @@ namespace InstallerRepack
             string pathToExe = Path.Combine(destinationPath, "Uninstall.exe");
             string roamingStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
             string commonStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-            string appStartMenuPath = Path.Combine(roamingStartMenuPath, "Programs", companyName);
-            string appStartMenuPath2 = Path.Combine(commonStartMenuPath, "Programs", companyName);
+            string appStartMenuPath = Path.Combine(roamingStartMenuPath, "Programs", programName);
+            string appStartMenuPath2 = Path.Combine(commonStartMenuPath, "Programs", programName);
 
             if (!Directory.Exists(appStartMenuPath))
                 Directory.CreateDirectory(appStartMenuPath);
@@ -433,19 +433,16 @@ namespace InstallerRepack
                 RegistryKey key = Registry.ClassesRoot.OpenSubKey(customProtocol);
 
                 if (key == null)
-                {
                     key = Registry.ClassesRoot.CreateSubKey(customProtocol);
 
-                    key.SetValue(string.Empty, "URL:" + customProtocol);
-                    key.SetValue("URL Protocol", string.Empty);
-                }
+                key.SetValue(string.Empty, "URL:" + customProtocol);
+                key.SetValue("URL Protocol", string.Empty);
 
                 var subKey = key.OpenSubKey(@"shell\open\command");
                 if (subKey == null)
-                {
                     subKey = key.CreateSubKey(@"shell\open\command");
-                    subKey.SetValue(string.Empty, $"\"{Path.Combine(destinationPath, exePath)}\" %1");
-                }
+
+                subKey.SetValue(string.Empty, $"\"{Path.Combine(destinationPath, exePath)}\" %1");
 
                 subKey.Close();
                 key.Close();
