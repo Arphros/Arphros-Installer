@@ -24,7 +24,7 @@ namespace InstallerRepack
         const string companyName = "Four Developers";
 
         // The version of the program
-        const string appVersion = "2.1f1";
+        const string appVersion = "2.3f1";
 
         // The link for the program
         const string programLink = "https://arphros.kjn.in.th";
@@ -48,7 +48,7 @@ namespace InstallerRepack
         };
 
         // Manually put the extracted size of your program (in bytes)
-        long archiveSize = 128307605;
+        long archiveSize = 128454656;
 
         // Put your archive on InstallerResource.resx
         static byte[] archiveBytes = InstallerResource.InstallationArchive;
@@ -280,9 +280,9 @@ namespace InstallerRepack
                         string executablePath = Path.Combine(destinationPath, exePath);
                         if (desktopIconBox.Checked) CreateDesktopShortcut();
                         if (startMenuIconBox.Checked) CreateStartMenuShortcut();
-                        foreach(var box in assocBoxes)
-                            box.TryAssignAssoc(executablePath);
                         CreateUrlProtocol();
+                        foreach (var box in assocBoxes)
+                            box.TryAssignAssoc(executablePath);
                         CreateUninstaller();
                         System.IO.File.WriteAllText(Path.Combine(destinationPath, "Uninstall.inf"), string.Join("\n", installedPaths));
                         System.IO.File.WriteAllBytes(Path.Combine(destinationPath, "Uninstall.exe"), InstallerResource.Uninstaller);
@@ -430,15 +430,15 @@ namespace InstallerRepack
             try
             {
                 string customProtocol = "arphros";
-                RegistryKey key = Registry.ClassesRoot.OpenSubKey(customProtocol);
+                var key = Registry.ClassesRoot.OpenSubKey(programName, true);
 
                 if (key == null)
-                    key = Registry.ClassesRoot.CreateSubKey(customProtocol);
+                    key = Registry.ClassesRoot.CreateSubKey(programName);
 
-                key.SetValue(string.Empty, "URL:" + customProtocol);
+                key.SetValue(null, "URL:" + customProtocol);
                 key.SetValue("URL Protocol", string.Empty);
 
-                var subKey = key.OpenSubKey(@"shell\open\command");
+                var subKey = key.OpenSubKey(@"shell\open\command", true);
                 if (subKey == null)
                     subKey = key.CreateSubKey(@"shell\open\command");
 
@@ -586,15 +586,19 @@ namespace InstallerRepack
 
         private static bool SetKeyDefaultValue(string keyPath, string value)
         {
-            using (var key = Registry.CurrentUser.CreateSubKey(keyPath))
+            var key = Registry.CurrentUser.OpenSubKey(keyPath, true);
+
+            if (key == null)
+                key = Registry.CurrentUser.CreateSubKey(keyPath);
+
+            if (key.GetValue(null) as string != value)
             {
-                if (key.GetValue(null) as string != value)
-                {
-                    key.SetValue(null, value);
-                    return true;
-                }
+                key.SetValue(null, value);
+                key.Close();
+                return true;
             }
 
+            key.Close();
             return false;
         }
     }
